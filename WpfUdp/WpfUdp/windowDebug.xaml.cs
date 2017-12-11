@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+
 namespace WpfUdp
 {
     /// <summary>
@@ -31,5 +32,25 @@ namespace WpfUdp
             MainWindow win = new MainWindow();
             win.Show();  
         }
+
+        
+
+
+        private void GetUserCode_Click(object sender, RoutedEventArgs e)
+        {
+            Class1 myClass = new Class1();
+            //string s = myClass.sendData().tostring();
+            myClass.sendData();
+
+            textUserCode.Text = myClass.returnData.ToString(); 
+        }
+
+      
+        private void Register_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+     
     }
 }

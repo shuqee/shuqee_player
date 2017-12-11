@@ -5,9 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUdp"
         mc:Ignorable="d"
-        Title="windowDebug" Height="300" Width="300">
-    <Grid>
-        <Button x:Name="button" Content="Button" Height="45" Margin="65,85,97,0" VerticalAlignment="Top" Click="button_Click"/>
-
+        Title="windowDebug" Height="282" Width="359">
+    <Grid HorizontalAlignment="Left" Height="250" Margin="1,3,0,-2" VerticalAlignment="Top" Width="340">
+        <Label x:Name="label" Content="用户码" HorizontalAlignment="Left" Height="30" Margin="45,35,0,0" VerticalAlignment="Top" Width="80"/>
+        <Label x:Name="label1" Content="注册码" HorizontalAlignment="Left" Height="30" Margin="45,85,0,0" VerticalAlignment="Top" Width="80"/>
+        <TextBlock x:Name="textUserCode" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="110,40,0,0" Width="210" Height="25"/>
+        <TextBlock x:Name="textRegisterCode" HorizontalAlignment="Left" Height="25" Margin="110,90,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
+        <Button x:Name="GetUserCode" Content="获取用户码" HorizontalAlignment="Left" Height="30" Margin="45,170,0,0" VerticalAlignment="Top" Width="80" Click="GetUserCode_Click"/>
+        <Button x:Name="Register" Content="注册" HorizontalAlignment="Left" Height="30" Margin="175,170,0,0" VerticalAlignment="Top" Width="80"/>
     </Grid>
 </Window>

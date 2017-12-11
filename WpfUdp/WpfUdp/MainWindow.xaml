@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="WpfUdp.MainWindow"
         Title="UDP调试助手" Height="591.212" Width="897.797" ResizeMode="CanMinimize" Loaded="Window_Loaded_1"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Icon="30001.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="121*"/>
@@ -11,8 +11,8 @@
         </Grid.ColumnDefinitions>
         <TextBox x:Name="textBoxReceive" HorizontalAlignment="Left" Height="275" Margin="252,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="479" FontSize="16" VerticalScrollBarVisibility="Auto" Grid.Column="1"/>
         <TextBox x:Name="textBoxSend" HorizontalAlignment="Left" Height="123" Margin="252,417,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="481" FontSize="16" AcceptsReturn="True" Grid.Column="1" />
-        <TextBox x:Name="textBoxIPAddress" HorizontalAlignment="Left" Height="27" Margin="97,138,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" FontSize="16" Text="192.168.0.101" Grid.ColumnSpan="2"/>
-        <TextBox x:Name="textBoxPortNum" HorizontalAlignment="Left" Height="27" Margin="97,178,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="117" FontSize="16" Text="50000" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="textBoxIPAddress" HorizontalAlignment="Left" Height="27" Margin="97,138,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" FontSize="16" Text="192.168.1.109" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="textBoxPortNum" HorizontalAlignment="Left" Height="27" Margin="97,178,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="117" FontSize="16" Text="1032" Grid.ColumnSpan="2"/>
         <TextBlock HorizontalAlignment="Left" Margin="17,135,0,0" TextWrapping="Wrap" Text="远程IP：" VerticalAlignment="Top" FontSize="16"/>
         <TextBlock HorizontalAlignment="Left" Margin="17,189,0,0" TextWrapping="Wrap" Text="端口号：" VerticalAlignment="Top" FontSize="16"/>
         <Button x:Name="btnSend" Content="发 送" HorizontalAlignment="Left" Margin="30,451,0,0" VerticalAlignment="Top" Width="100" FontSize="16" Click="btnSend_Click" Grid.ColumnSpan="2"/>
@@ -21,11 +21,14 @@
         <Button x:Name="btnClearReceive" Content="清空接收区" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" FontSize="16" Height="27" Click="btnClearReceive_Click" Margin="30,397,0,0" Grid.ColumnSpan="2"/>
         <TextBlock HorizontalAlignment="Left" Margin="16,32,0,0" TextWrapping="Wrap" Text="本地IP：" VerticalAlignment="Top" FontSize="16"/>
         <TextBlock HorizontalAlignment="Left" Margin="16,85,0,0" TextWrapping="Wrap" Text="端口号：" VerticalAlignment="Top" FontSize="16" RenderTransformOrigin="0.547,0.095"/>
-        <TextBox x:Name="textBoxLocalPortNum" HorizontalAlignment="Left" Height="27" Margin="97,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" FontSize="16" Text="50000" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="textBoxLocalPortNum" HorizontalAlignment="Left" Height="27" Margin="97,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="213" FontSize="16" Text="1030" Grid.ColumnSpan="2"/>
         <Button x:Name="btnLink" Content="连  接" HorizontalAlignment="Left" Margin="30,283,0,0" VerticalAlignment="Top" Width="100" FontSize="16" Click="btnLink_Click" Grid.ColumnSpan="2"/>
         <Button x:Name="btnUnLink" Content="断  开" HorizontalAlignment="Left" Margin="30,333,0,0" VerticalAlignment="Top" Width="100" FontSize="16" Click="btnUnLink_Click" Grid.ColumnSpan="2"/>
         <ComboBox x:Name="cmbIPAddress" HorizontalAlignment="Left" Margin="97,32,0,0" VerticalAlignment="Top" Width="213" IsEditable="True" FontSize="14" Height="27" Grid.ColumnSpan="2"/>
         <Button x:Name="button" Content="退出" HorizontalAlignment="Left" Height="25" Margin="30,0,0,22" VerticalAlignment="Bottom" Width="100" FontSize="16" Click="button_Click" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="textBox" Grid.Column="1" HorizontalAlignment="Left" Height="25" Margin="-10,230,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="139.028"/>
+        <Button x:Name="button1" Content="校验" Grid.Column="1" HorizontalAlignment="Left" Height="24.32" Margin="54.028,0,0,85.369" VerticalAlignment="Bottom" Width="100" RenderTransformOrigin="0.5,0.431" Click="button1_Click"/>
+        <CheckBox x:Name="checkBox" Content="定时发送" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="61,405,0,0"  Click="checkBox_Click"/>
 
     </Grid>
 </Window>
