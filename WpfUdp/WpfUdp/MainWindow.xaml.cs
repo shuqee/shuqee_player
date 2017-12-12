@@ -25,7 +25,7 @@ namespace WpfUdp
         private UInt16 localPortNum;
         private UdpClient udpClient;
         bool receiveThreadAlive; //控制接收线程的退出
-         //定义定时器DispatcherTimer
+       //定义定时器DispatcherTimer
         System.Windows.Threading.DispatcherTimer readDataTimer = new System.Windows.Threading.DispatcherTimer();
 
         byte[] actionFile;       //声明一个名为actionFile的数组，用于存储动作文件数据
@@ -37,13 +37,11 @@ namespace WpfUdp
             InitializeComponent();
             receiveThreadAlive = false;
             readFile();               //执行读取动作文件函数
+            Link();                   //执行连接函数，开启线程
 
-            //DispatcherTimer定时器初始化
-            //btnSend.Click += btnSend_Click;
-            
-            readDataTimer.Tick += new EventHandler(timeCycle );
+            //DispatcherTimer定时器初始化    
+            readDataTimer.Tick += new EventHandler(timeCycle);
             readDataTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
-
 
         }
 
@@ -54,14 +52,59 @@ namespace WpfUdp
         /// <param name="str"></param>
         public void SetTextBox(string str)
         {
-            textBoxReceive.Text += str;
+            textBoxReceive.Text += str + "\r\n";
             //textBoxReceive.Text += str.ToString("x2");
 
             textBoxReceive.ScrollToEnd();
+            try
+            {
+                byte[] timeCode = new byte[12];
+                timeCode = System.Text.Encoding.Default.GetBytes(str);
+                textBox.Text = timeCode.Length.ToString();
+                if (timeCode.Length == 12)
+                {
+                    int[] trueTimeCode = new int[14];
+                    int Pswd = 0;
 
+                    Pswd = (timeCode[11] - 65) * 1000;
+                    Pswd = Pswd + (timeCode[6] - 65) * 100;
+                    Pswd = Pswd + (timeCode[0] - 65) * 10;
+                    Pswd = Pswd + (timeCode[4] - 65);
+                    
+                    Pswd = Pswd * 43 + 10345;
+                    Pswd = Pswd % 100000;
+
+                    trueTimeCode[1] = Pswd / 10000;
+                    trueTimeCode[2] = (Pswd / 1000) % 10;
+                    trueTimeCode[3] = (Pswd / 100) % 10;
+                    trueTimeCode[4] = (Pswd % 100) / 10;
+                    trueTimeCode[5] = Pswd % 10;
+
+                    ///将接收的字符串转换成最终的时间
+                    trueTimeCode[6] = trueTimeCode[3] ^ (timeCode[10] - 65);     //小时十位
+                    trueTimeCode[7] = trueTimeCode[4] ^ (timeCode[1] - 65);      //小时个位
+
+                    trueTimeCode[8] = trueTimeCode[1] ^ (timeCode[3] - 65);      //分十位
+                    trueTimeCode[9] = trueTimeCode[4] ^ (timeCode[8] - 65);      //分个位
+
+                    trueTimeCode[10] = trueTimeCode[1] ^ (timeCode[5] - 65);    //秒十位
+                    trueTimeCode[11] = trueTimeCode[3] ^ (timeCode[2] - 65);    //秒个位
+
+                    trueTimeCode[12] = trueTimeCode[2] ^ (timeCode[9] - 65);    //帧十位
+                    trueTimeCode[13] = trueTimeCode[5] ^ (timeCode[7] - 65);    //帧个位 
+
+                    textBox.Text = trueTimeCode[6].ToString() + trueTimeCode[7].ToString() + ":" + trueTimeCode[8].ToString() + trueTimeCode[9].ToString() + ":" + trueTimeCode[10].ToString() + trueTimeCode[11].ToString() + ":" + trueTimeCode[12].ToString() + trueTimeCode[13].ToString();
+                }
+            
+            }
+            catch
+            {
+            //    MessageBox.Show("数据不正确");
+            }
         }
-        delegate void TextBoxCallback(string str);
 
+
+        delegate void TextBoxCallback(string str);
 
         /// <summary>
         /// 接收数据
@@ -88,12 +131,37 @@ namespace WpfUdp
                 {
                     //关闭udpClient时此句会产生异常
                     byte[] bytes = udpClient.Receive(ref remote);
-                    // textBox.Text = bytes[0].ToString(); 
+                   // string str = "";
+                    string[] strArray = new string[bytes.Length];     //定义一个字符串数组，用于存储接收到的byte数组
+
+                    //try
+                    //{
+                    //    //以十进制形式显示数据
+                    //    //strArray[0] = bytes[0].ToString();
+                    //    //strArray[1] = bytes[1].ToString();
+                    //    //strArray[2] = bytes[2].ToString();
+                    //    //strArray[3] = bytes[3].ToString();
+                    //    //strArray[4] = bytes[4].ToString();
+
+                    //    ///以16进制形式显示数据
+                    //    strArray[0] = bytes[0].ToString("x");
+                    //    strArray[1] = bytes[1].ToString("x");
+                    //    strArray[2] = bytes[2].ToString("x");
+                    //    strArray[3] = bytes[3].ToString("x");
+                    //    strArray[4] = bytes[4].ToString("x");
+
+                    //    str = strArray[0] + strArray[1] + strArray[2] + strArray[3] + strArray[4];
+                    //}
+                    //catch
+                    //{
+
+                    //}
+
+                    //将bytes数组转换成字符串
                     string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-                    // str = remote.ToString() + ": " + str + "\r\n";
+                    // str = remote.ToString() + ": " + str + "\r\n";           //将ip地址与端口号和接收到数据赋值给str
                     TextBoxCallback tx = SetTextBox;
                     this.Dispatcher.Invoke(tx, str);
-
 
                 }
                 catch //捕捉关闭时产生的异常，结束接收线程
@@ -104,6 +172,7 @@ namespace WpfUdp
                 }
             }
         }
+
         /// <summary>
         /// 发送数据函数
         /// </summary>
@@ -133,7 +202,7 @@ namespace WpfUdp
             IPEndPoint iep = new IPEndPoint(remoteIP, port);
             try
             {
-              
+
                 data_buf[0] = 0xff;
                 data_buf[1] = 0x4a;
                 data_buf[2] = data1;
@@ -196,12 +265,12 @@ namespace WpfUdp
                 string strYear = currentTime.ToString("yy");             //获取当前年的后两位
                 textBox.Text = strYear;
 
-                
+
                 byte YY = Convert.ToByte(strYear);    //将字符串strYear转换成byte型             
                 byte MM = (byte)currentTime.Month;    //将int型当前月转换成byte型
-                byte DD = (byte)currentTime.Day ;     //将int型当前日转换成byte型
+                byte DD = (byte)currentTime.Day;     //将int型当前日转换成byte型
 
-                
+
                 ///将int型转换成byte数组
                 //byte[] YY = System.BitConverter.GetBytes(currentTime.Year );
                 //byte[] MM = System.BitConverter.GetBytes(currentTime.Month );
@@ -267,7 +336,7 @@ namespace WpfUdp
         }
 
         /// <summary>
-        /// 点击清空接收区的内容
+        /// 点击按钮清空接收区的内容
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -278,7 +347,7 @@ namespace WpfUdp
 
 
         /// <summary>
-        /// 点击建立连接
+        /// 点击连接按钮建立连接
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -320,7 +389,33 @@ namespace WpfUdp
 
 
         /// <summary>
-        /// 点击断开连接
+        /// 建立连接，用于开启线程
+        /// </summary>
+
+        private void Link()
+        {
+            IPAddress localIP;
+            IPAddress.TryParse("192.168.1.109", out localIP);
+            UInt16 port = 1030;
+            localIPAddr = localIP;
+            localPortNum = port;
+            Thread thread1 = new Thread(new ThreadStart(ReceiveThreadProc));
+            thread1.IsBackground = true; //设置为后台线程
+            thread1.Start();
+            Thread.Sleep(5);
+            //if (receiveThreadAlive == true)
+            //{
+            //    SetTextBox("已连接\r\n");
+            //}
+            //else
+            //{
+            //    SetTextBox("连接失败\r\n");
+            //}
+
+        }
+
+        /// <summary>
+        /// 点击按钮断开连接
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -374,14 +469,14 @@ namespace WpfUdp
         /// <param name="e"></param>
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            sendCheckData();   
+            sendCheckData();
         }
 
 
         /// <summary>
         /// 读取动作文件和特效文件
         /// </summary>
-        private   void readFile()
+        private void readFile()
         {
             try
             {
@@ -396,7 +491,7 @@ namespace WpfUdp
 
                     MessageBox.Show("特效文件不存在，请把A-T文件复制到当前目录");
                 }
-                }
+            }
             catch
             {
                 MessageBox.Show("动作文件不存在，请把A-D文件复制到当前目录");
@@ -412,7 +507,7 @@ namespace WpfUdp
             //    sendData(actionFile[3*i ], actionFile [3*i+1], actionFile[3*i+2], effectFile[2*i], effectFile[2*i+1]);
             //    i++;
             //}
-         }
+        }
 
         /// <summary>
         /// check选框打勾定时器启动，自动发送数据
@@ -421,7 +516,7 @@ namespace WpfUdp
         /// <param name="e"></param>
         private void checkBox_Click(object sender, RoutedEventArgs e)
         {
-            if(checkBox.IsChecked==true)
+            if (checkBox.IsChecked == true)
             {
                 readDataTimer.Start();
             }

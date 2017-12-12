@@ -56,7 +56,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Module.cs" />
     <Compile Include="windowDebug.xaml.cs">
       <DependentUpon>windowDebug.xaml</DependentUpon>
     </Compile>

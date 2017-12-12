@@ -26,7 +26,7 @@
         <Button x:Name="btnUnLink" Content="断  开" HorizontalAlignment="Left" Margin="30,333,0,0" VerticalAlignment="Top" Width="100" FontSize="16" Click="btnUnLink_Click" Grid.ColumnSpan="2"/>
         <ComboBox x:Name="cmbIPAddress" HorizontalAlignment="Left" Margin="97,32,0,0" VerticalAlignment="Top" Width="213" IsEditable="True" FontSize="14" Height="27" Grid.ColumnSpan="2"/>
         <Button x:Name="button" Content="退出" HorizontalAlignment="Left" Height="25" Margin="30,0,0,22" VerticalAlignment="Bottom" Width="100" FontSize="16" Click="button_Click" Grid.ColumnSpan="2"/>
-        <TextBox x:Name="textBox" Grid.Column="1" HorizontalAlignment="Left" Height="25" Margin="-10,230,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="139.028"/>
+        <TextBox x:Name="textBox" Grid.Column="1" HorizontalAlignment="Left" Height="25" Margin="-10,230,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="164.028"/>
         <Button x:Name="button1" Content="校验" Grid.Column="1" HorizontalAlignment="Left" Height="24.32" Margin="54.028,0,0,85.369" VerticalAlignment="Bottom" Width="100" RenderTransformOrigin="0.5,0.431" Click="button1_Click"/>
         <CheckBox x:Name="checkBox" Content="定时发送" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="61,405,0,0"  Click="checkBox_Click"/>
 

@@ -20,37 +20,45 @@ namespace WpfUdp
     /// </summary>
     public partial class windowDebug : Window
     {
+        Module myClass = new Module();
         public windowDebug()
         {
             InitializeComponent();
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-            //this.Close();
-            this.Hide();
-            MainWindow win = new MainWindow();
-            win.Show();  
-        }
+        //private void button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    //this.Close();
+        //    this.Hide();
+        //    MainWindow win = new MainWindow();
+        //    win.Show();  
+        //}
 
         
 
 
         private void GetUserCode_Click(object sender, RoutedEventArgs e)
         {
-            Class1 myClass = new Class1();
-            //string s = myClass.sendData().tostring();
-            myClass.sendData();
+            //Module  myClass = new Module ();
+            myClass.sendData(1,2,3,4,5);                   //调用类名为Module中的函数sendData
 
-            textUserCode.Text = myClass.returnData.ToString(); 
+            Random rd = new Random();
+            int ii = rd.Next();
+            textUserCode.Text = myClass.returnData.ToString()+ii.ToString() ; 
         }
 
       
-        private void Register_Click(object sender, RoutedEventArgs e)
-        {
 
+
+        private void textUserCode_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //MessageBox.Show("123");
+            textRegisterCode.Text  = "123";
         }
 
-     
+        private void Register_Click(object sender, RoutedEventArgs e)
+        {
+            myClass.sendCheckData();
+        }
     }
 }
