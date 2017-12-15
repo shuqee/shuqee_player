@@ -21,23 +21,24 @@ namespace WpfUdp
 {
     public partial class MainWindow : Window
     {
-        private IPAddress localIPAddr;
-        private UInt16 localPortNum;
-        private UdpClient udpClient;
-        bool receiveThreadAlive; //控制接收线程的退出
-       //定义定时器DispatcherTimer
+        public IPAddress localIPAddr;
+        public UInt16 localPortNum;
+        public UdpClient udpClient;
+        public bool receiveThreadAlive; //控制接收线程的退出
+                                        //定义定时器DispatcherTimer
         System.Windows.Threading.DispatcherTimer readDataTimer = new System.Windows.Threading.DispatcherTimer();
+        Module myClass = new Module();       //新建一个Module对象，用于在当前类调用Module类中的方法
 
         byte[] actionFile;       //声明一个名为actionFile的数组，用于存储动作文件数据
         byte[] effectFile;       //声明一个名为effectFile的数组，用于存储特效文件数据  
-        int i = 0;               //声明一个int变量，用于定时器自动发送数据计数
+        int timerCount = 0;               //声明一个int变量，用于定时器自动发送数据计数
 
         public MainWindow()
         {
             InitializeComponent();
             receiveThreadAlive = false;
-            readFile();               //执行读取动作文件函数
-            Link();                   //执行连接函数，开启线程
+            readFile();                 //执行读取动作文件函数
+            Link();                     //执行连接函数，开启线程
 
             //DispatcherTimer定时器初始化    
             readDataTimer.Tick += new EventHandler(timeCycle);
@@ -54,13 +55,14 @@ namespace WpfUdp
         {
             textBoxReceive.Text += str + "\r\n";
             //textBoxReceive.Text += str.ToString("x2");
+            //myClass.sendCheckData();
 
             textBoxReceive.ScrollToEnd();
             try
             {
                 byte[] timeCode = new byte[12];
                 timeCode = System.Text.Encoding.Default.GetBytes(str);
-                textBox.Text = timeCode.Length.ToString();
+                //textBox.Text = timeCode.Length.ToString();
                 if (timeCode.Length == 12)
                 {
                     int[] trueTimeCode = new int[14];
@@ -70,7 +72,7 @@ namespace WpfUdp
                     Pswd = Pswd + (timeCode[6] - 65) * 100;
                     Pswd = Pswd + (timeCode[0] - 65) * 10;
                     Pswd = Pswd + (timeCode[4] - 65);
-                    
+
                     Pswd = Pswd * 43 + 10345;
                     Pswd = Pswd % 100000;
 
@@ -95,14 +97,13 @@ namespace WpfUdp
 
                     textBox.Text = trueTimeCode[6].ToString() + trueTimeCode[7].ToString() + ":" + trueTimeCode[8].ToString() + trueTimeCode[9].ToString() + ":" + trueTimeCode[10].ToString() + trueTimeCode[11].ToString() + ":" + trueTimeCode[12].ToString() + trueTimeCode[13].ToString();
                 }
-            
+
             }
             catch
             {
-            //    MessageBox.Show("数据不正确");
+                //    MessageBox.Show("数据不正确");
             }
         }
-
 
         delegate void TextBoxCallback(string str);
 
@@ -113,9 +114,12 @@ namespace WpfUdp
         {
             try
             {
+                //if (Module.changeWindow == false)
+                //{
                 IPEndPoint ipEP = new IPEndPoint(localIPAddr, localPortNum);
                 //在本机指定的端口接收
                 udpClient = new UdpClient(ipEP);
+                //}
             }
             catch (SocketException s)//IP地址不是本机IP时，会发生异常
             {
@@ -131,35 +135,37 @@ namespace WpfUdp
                 {
                     //关闭udpClient时此句会产生异常
                     byte[] bytes = udpClient.Receive(ref remote);
-                   // string str = "";
+                    string str = "";
                     string[] strArray = new string[bytes.Length];     //定义一个字符串数组，用于存储接收到的byte数组
 
-                    //try
-                    //{
-                    //    //以十进制形式显示数据
-                    //    //strArray[0] = bytes[0].ToString();
-                    //    //strArray[1] = bytes[1].ToString();
-                    //    //strArray[2] = bytes[2].ToString();
-                    //    //strArray[3] = bytes[3].ToString();
-                    //    //strArray[4] = bytes[4].ToString();
+                    try
+                    {
+                        //以十进制形式显示数据
 
-                    //    ///以16进制形式显示数据
-                    //    strArray[0] = bytes[0].ToString("x");
-                    //    strArray[1] = bytes[1].ToString("x");
-                    //    strArray[2] = bytes[2].ToString("x");
-                    //    strArray[3] = bytes[3].ToString("x");
-                    //    strArray[4] = bytes[4].ToString("x");
+                        for (int i = 0; i < bytes.Length; i++)
+                        {
+                            strArray[i] = bytes[i].ToString();
+                            str += strArray[i];
+                        }
 
-                    //    str = strArray[0] + strArray[1] + strArray[2] + strArray[3] + strArray[4];
-                    //}
-                    //catch
-                    //{
+                        //以16进制形式显示数据
 
-                    //}
+                        //for (int i = 0; i < bytes.Length; i++)
+                        //{
+                        //    strArray[i] = bytes[i].ToString("x");
+                        //    str += strArray[i];
+                        //    
+                        //}
+                        
+                    }
+                    catch
+                    {
+
+                    }
 
                     //将bytes数组转换成字符串
-                    string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-                    // str = remote.ToString() + ": " + str + "\r\n";           //将ip地址与端口号和接收到数据赋值给str
+                    // string str = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                    // str = remote.ToString() + ": " + str + "\r\n";                 //将ip地址与端口号和接收到数据赋值给str
                     TextBoxCallback tx = SetTextBox;
                     this.Dispatcher.Invoke(tx, str);
 
@@ -179,7 +185,7 @@ namespace WpfUdp
         private void sendData(byte data1, byte data2, byte data3, byte data4, byte data5)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(textBoxSend.Text);
-            byte[] data_buf = new byte[1024];
+            byte[] data_buf = new byte[10];
             int data_len = 0;
             if (bytes.Length == 0)
             {
@@ -312,7 +318,7 @@ namespace WpfUdp
         /// <param name="e"></param>
         private void timeCycle(object sender, EventArgs e)
         {
-            //int i = 0;
+            int i = 0;
             if (i < actionFile.Length / 3)
             {
                 sendData(actionFile[3 * i], actionFile[3 * i + 1], actionFile[3 * i + 2], effectFile[2 * i], effectFile[2 * i + 1]);
@@ -399,18 +405,15 @@ namespace WpfUdp
             UInt16 port = 1030;
             localIPAddr = localIP;
             localPortNum = port;
+            //if (receiveThreadAlive == false)
+            //{
+            //    receiveThreadAlive = true;
+            //}
             Thread thread1 = new Thread(new ThreadStart(ReceiveThreadProc));
             thread1.IsBackground = true; //设置为后台线程
             thread1.Start();
             Thread.Sleep(5);
-            //if (receiveThreadAlive == true)
-            //{
-            //    SetTextBox("已连接\r\n");
-            //}
-            //else
-            //{
-            //    SetTextBox("连接失败\r\n");
-            //}
+
 
         }
 
@@ -447,19 +450,14 @@ namespace WpfUdp
                 if (ip.AddressFamily.ToString() == ProtocolFamily.InterNetwork.ToString()) //如果是IPv4地址
                 {
                     cmbIPAddress.Items.Add(ip.ToString());
+                    //textBox.Text = ip.ToString();
                 }
             }
             cmbIPAddress.SelectedIndex = 0;
+
             cmbIPAddress.Items.Add("127.0.0.1");
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-            //this.Close();
-            this.Hide();
-            windowDebug win = new windowDebug();
-            win.Show();
-        }
 
 
         /// <summary>
@@ -524,6 +522,31 @@ namespace WpfUdp
             {
                 readDataTimer.Stop();
             }
+        }
+
+
+        /// <summary>
+        /// 点击弹出注册框
+        /// </summary>
+        private void btnRenewal_Click(object sender, RoutedEventArgs e)
+        {
+
+            //this.Close();                                //关闭当前窗口
+            //this.Hide();                                 //隐藏当前窗口
+            if (receiveThreadAlive == true)
+            {
+                receiveThreadAlive = false;
+                if (udpClient != null)
+                {
+                    udpClient.Close();                     //断开udp连接  
+                }
+                //SetTextBox();
+            }
+            this.Hide();
+            RegisterWindow win = new RegisterWindow();
+            win.Show();                                  //显示RegisterWindow窗口
+
+
         }
     }
 }

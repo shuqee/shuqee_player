@@ -1,0 +1,17 @@
+﻿<Window x:Class="WpfUdp.RegisterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfUdp"
+        mc:Ignorable="d"
+        Title="注册" Height="282" Width="359"  Closed="Window_Closed">
+    <Grid HorizontalAlignment="Left" Height="250" Margin="1,3,0,-2" VerticalAlignment="Top" Width="340">
+        <Label x:Name="label" Content="用户码" HorizontalAlignment="Left" Height="30" Margin="20,35,0,0" VerticalAlignment="Top" Width="80"/>
+        <Label x:Name="label1" Content="注册码" HorizontalAlignment="Left" Height="30" Margin="20,84,0,0" VerticalAlignment="Top" Width="80"/>
+        <Button x:Name="GetUserCode" Content="获取用户码" HorizontalAlignment="Left" Height="30" Margin="45,170,0,0" VerticalAlignment="Top" Width="80" Click="GetUserCode_Click"/>
+        <Button x:Name="Register" Content="注册" HorizontalAlignment="Left" Height="30" Margin="170,170,0,0" VerticalAlignment="Top" Width="80" Click="Register_Click"/>
+        <TextBox x:Name="textUserCode" Height="25" Margin="85,40,10,0" TextWrapping="Wrap" VerticalAlignment="Top" TextChanged="textUserCode_TextChanged" />
+        <TextBox x:Name="textRegisterCode" Height="25" Margin="85,89,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+    </Grid>
+</Window>
