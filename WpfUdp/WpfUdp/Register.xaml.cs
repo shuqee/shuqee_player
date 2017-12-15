@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,16 +22,16 @@ namespace WpfUdp
     /// </summary>
     public partial class RegisterWindow : Window
     {
-        
+
 
         string userCode;                  //用户码
         string RegisterCode;              //注册码
-        //Module myClass = new Module();
-        
+        Module myClass = new Module();
+
         public RegisterWindow()
         {
             InitializeComponent();
-            
+
         }
 
         //private void button_Click(object sender, RoutedEventArgs e)
@@ -41,7 +42,7 @@ namespace WpfUdp
         //    win.Show();  
         //}
 
-        
+
 
 
         private void GetUserCode_Click(object sender, RoutedEventArgs e)
@@ -72,10 +73,10 @@ namespace WpfUdp
                 for (int i = 0; i < s.Length; i++)
                 {
                     // 将得到的字符串使用十六进制类型格式。格式后的字符是小写的字母，如果使用大写（X）则格式后的字符是大写字符 
-                    pwd = pwd + s[i].ToString("X");
+                    pwd = pwd + (s[i].ToString("X").Length <2?"0"+s[i].ToString("X"):s[i].ToString("X"));
                     //pwd = pwd + s[i].ToString("x");
                 }
-                
+
             }
             catch
             {
@@ -88,142 +89,114 @@ namespace WpfUdp
         private void textUserCode_TextChanged(object sender, TextChangedEventArgs e)
         {
             //MessageBox.Show("123");
-          
+
             RegisterCode = MD5Encrypt32(MD5Encrypt32(MD5Encrypt32(userCode)));
-           
-            
+
+
         }
 
         private void Register_Click(object sender, RoutedEventArgs e)
         {
-//            Dim mm8 As Byte
-//Dim mm9 As Byte
-//Dim S As String
-//Dim ss As String
-//Dim ss1 As String
-//Dim ss2 As String
-//Dim ss3 As String
-//Dim ss4 As String
-//Dim ss5 As String
-//Dim s1 As String
-//Dim s11 As String
-//Dim s12 As String
-//Dim s13 As String
-//Dim s14 As String
-//Dim s15 As String
-//S = Text2.Text
-//ss1 = Mid(S, 1, 4)
-//s11 = Mid(S, 5, 1)
+            try
+            { 
 
-//ss2 = Mid(S, 6, 6)
-//s12 = Mid(S, 12, 1)
+            string changeRegisterCode = textRegisterCode.Text;        //注册码文本框的字符串包含期限信息
 
-//ss3 = Mid(S, 13, 8)
-//s13 = Mid(S, 21, 1)
+            string ss1 = changeRegisterCode.Substring(0, 4);
+            string s11 = changeRegisterCode.Substring(4, 1);
 
-//ss4 = Mid(S, 22, 10)
-//s14 = Mid(S, 32, 1)
+            string ss2 = changeRegisterCode.Substring(5, 6);
+            string s12 = changeRegisterCode.Substring(11, 1);
 
-//s15 = Mid(S, 33, 2)
-//ss5 = Mid(S, 35, 4)
+            string ss3 = changeRegisterCode.Substring(12, 8);
+            string s13 = changeRegisterCode.Substring(20, 1);
 
-//ss = ss1 & ss2 & ss3 & ss4 & ss5
-//s1 = Val(s11) + Val(s12) + Val(s13) + Val(s14)
-//If s1 <> 36 Then
-//dT = &H4
-//qixian = 1000 * Val(s11) + 100 * Val(s12) + 10 * Val(s13) + Val(s14)
-//'YYc = (Int(qixian / 365))
-//'qian1 = qixian Mod 365
-//'MMc = (Int(qixian1 / 30))
-//'DDc = (qixian1 Mod 30)
-// 'Text3.Text = YYc
-// 'Text4.Text = MMc
-// 'Text5.Text = DDc
+            string ss4 = changeRegisterCode.Substring(21, 10);
+            string s14 = changeRegisterCode.Substring(31, 1);
 
 
-//Text3.Text = Int(qixian / 365)
-//qixian1 = qixian Mod 365
-//Text4.Text = Int(qixian1 / 30)
-//Text5.Text = qixian1 Mod 30
+            string s15 = changeRegisterCode.Substring(32, 2);
+            string ss5 = changeRegisterCode.Substring(34, 4);
 
-//YYc = Text3.Text
-//MMc = Text4.Text
-//DDc = Text5.Text
+            //得到最终的注册码
+            string ss = ss1 + ss2 + ss3 + ss4 + ss5;
+            //注册码的期限信息
+            int s1 = Int32.Parse(s11) + Int32.Parse(s12) + Int32.Parse(s13) + Int32.Parse(s14);
 
-//Else
-//dT = &H9
-//End If
-
-//If SHUQEE = ss And s1 = Val(s15) Then
-//MsgBox "注册成功"
-//Call serialintt(Form1.MSComm1)
-//Form11.Hide
-//Form1.Show
-//UDPStart = True
-//mm8 = &H88
-//mm9 = &H1
-
-//        YY = YY Xor & H5A          '加密
-//        MM = MM Xor & H7C
-//        DD = DD Xor & HB8
+            if (s1 != 36) //转换成实际的期限
+            {
+                Module.deadlineOrPermanent = 0x4;
+                int totalDays = 1000 * (Int32.Parse(s11)) + 100 * (Int32.Parse(s12)) + 10 * (Int32.Parse(s13)) + Int32.Parse(s14);
+                Module.deadlineYY = (byte)(totalDays / 365);
+                int remainDays = totalDays % 365;
+                Module.deadlineMM = (byte)(remainDays / 30);
+                Module.deadlineDD = (byte)(remainDays % 30);
+            }
+            else     //永久码
+            {
+                Module.deadlineOrPermanent = 0x9;
+            }
 
 
-//        id1 = id1 Xor & H33
-//        id2 = id2 Xor & H44
-//        id3 = id3 Xor & H55
-//        id4 = id4 Xor & H66
-//        id5 = id5 Xor & H77
-//        id6 = id6 Xor & H88
-//        id7 = id7 Xor & H99
-
-
-//        id1 = id1 Xor & H34
-//        id2 = id2 Xor & H75
-//        id3 = id3 Xor & H6A
-//        id4 = id4 Xor & H7B
-//        id5 = id5 Xor & H4A
-//        id6 = id6 Xor & H7C
-//        id7 = id7 Xor & H8F
-//   Open "C:\WINDOWS\system32\shuqee.bin" For Binary As #1
-//        Put #1, , id1
-//        Put #1, , id2
-//        Put #1, , id3
-//        Put #1, , id4
-//        Put #1, , id5
-//        Put #1, , id6
-//        Put #1, , id7
-//        Put #1, , mm8
-//        Put #1, , mm9
-//        Put #1, , YY
-//        Put #1, , MM
-//        Put #1, , DD
-//                      '重新写数据给shuqee
-//        Close #1
-//Else
-//MsgBox "注册失败"
-//End If
-//End Sub
-
-            if (textRegisterCode.Text== RegisterCode)
+            if (ss == RegisterCode && s1 == Int32.Parse(s15))
             {
                 MessageBox.Show("注册成功");
+                myClass.GetChipId();
+                this.Hide();
+                MainWindow mainwindow = new MainWindow();
+                mainwindow.Show();
+                Module.chipID[7] = 0x88;
+                Module.chipID[8] = 0x1;
+                Module.chipID[9] = Module.YY;
+                Module.chipID[10] = Module.MM;
+                Module.chipID[11] = Module.DD;
+
+                Module.YY ^= 0x5a;
+                Module.MM ^= 0x7c;
+                Module.DD ^= 0xB8;
+
+                Module.chipID[0] ^= 0x33;
+                Module.chipID[1] ^= 0x44;
+                Module.chipID[2] ^= 0x55;
+                Module.chipID[3] ^= 0x66;
+                Module.chipID[4] ^= 0x77;
+                Module.chipID[5] ^= 0x88;
+                Module.chipID[6] ^= 0x99;
+
+                Module.chipID[0] ^= 0x34;
+                Module.chipID[1] ^= 0x75;
+                Module.chipID[2] ^= 0x6a;
+                Module.chipID[3] ^= 0x7b;
+                Module.chipID[4] ^= 0x4a;
+                Module.chipID[5] ^= 0x7c;
+                Module.chipID[6] ^= 0x8f;
+
+                File.WriteAllBytes(@"C: \Users\shuqee\Desktop\shuqee.bin", Module.chipID);
+
             }
             else
             {
                 MessageBox.Show("注册失败");
             }
+            }
+            catch
+            {
+
+                MessageBox.Show("输入的注册码长度不正确，请检查");
+            }
+          
             //textRegisterCode.Text = RegisterCode;
             //myClass.sendCheckData();
         }
 
-       
+
 
         private void Window_Closed(object sender, EventArgs e)
         {
-        
+
             MainWindow mainwindow = new MainWindow();
             mainwindow.Show();
-        
+
         }
     }
 }

@@ -24,13 +24,13 @@ namespace WpfUdp
         public IPAddress localIPAddr;
         public UInt16 localPortNum;
         public UdpClient udpClient;
-        public bool receiveThreadAlive; //控制接收线程的退出
-                                        //定义定时器DispatcherTimer
+        public bool receiveThreadAlive;      //控制接收线程的退出
+                                             //定义定时器DispatcherTimer
         System.Windows.Threading.DispatcherTimer readDataTimer = new System.Windows.Threading.DispatcherTimer();
         Module myClass = new Module();       //新建一个Module对象，用于在当前类调用Module类中的方法
 
-        byte[] actionFile;       //声明一个名为actionFile的数组，用于存储动作文件数据
-        byte[] effectFile;       //声明一个名为effectFile的数组，用于存储特效文件数据  
+        byte[] actionFile;                //声明一个名为actionFile的数组，用于存储动作文件数据
+        byte[] effectFile;                //声明一个名为effectFile的数组，用于存储特效文件数据  
         int timerCount = 0;               //声明一个int变量，用于定时器自动发送数据计数
 
         public MainWindow()
@@ -223,7 +223,7 @@ namespace WpfUdp
                 myUdpClient.Send(data_buf, data_len, iep);
                 //myUdpClient.SendAsync(11,23,iep);
                 myUdpClient.Close();
-                //textBoxSend.Focus();
+                
             }
             catch (Exception err)
             {
