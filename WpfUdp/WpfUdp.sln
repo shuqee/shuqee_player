@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfUdp", "WpfUdp\WpfUdp.csproj", "{F15B26DB-8B85-480F-A4DE-F8249669ADDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfUdpTests", "WpfUdpTests\WpfUdpTests.csproj", "{4A9129DC-4557-49B9-87FB-91924788E0EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,10 @@ Global
 		{F15B26DB-8B85-480F-A4DE-F8249669ADDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F15B26DB-8B85-480F-A4DE-F8249669ADDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F15B26DB-8B85-480F-A4DE-F8249669ADDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A9129DC-4557-49B9-87FB-91924788E0EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A9129DC-4557-49B9-87FB-91924788E0EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A9129DC-4557-49B9-87FB-91924788E0EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A9129DC-4557-49B9-87FB-91924788E0EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
