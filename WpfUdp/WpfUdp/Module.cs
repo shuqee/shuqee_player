@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -16,13 +17,16 @@ namespace WpfUdp
                                                      //public MainWindow mainwindow = new MainWindow();
         public static bool changeWindow;             //定义静态变量
         public static byte[] chipID = new byte[12];  //用于存储shuqee.bin文件的数据
-        public static byte YY;               
+        public static byte YY;
         public static byte MM;
         public static byte DD;
+        public static byte HH;
+        public static byte mm;
         public static byte deadlineYY;             //注册后的期限年
         public static byte deadlineMM;             //注册后的期限月
         public static byte deadlineDD;             //注册后的期限日
         public static byte deadlineOrPermanent;    //注册码是否为永久码 
+        public static SerialPort com1 = new SerialPort();
 
         /// <summary>
         /// 发送动作数据与特效数据函数
@@ -32,7 +36,7 @@ namespace WpfUdp
         /// <param name="data3">3号缸数据</param>
         /// <param name="data4">环境特效数据</param>
         /// <param name="data5">座椅特效数据</param>
-        public void sendData(byte data1, byte data2, byte data3, byte data4, byte data5)
+        public static void sendData(byte data1, byte data2, byte data3, byte data4, byte data5)
         {
 
             byte[] data_buf = new byte[16];
@@ -66,15 +70,22 @@ namespace WpfUdp
                 MessageBox.Show(err.Message, "发送失败");
             }
         }
-        public void GetChipId()
-        {
-            System.DateTime currentTime = new System.DateTime();
-            currentTime = System.DateTime.Now;    //获取当前时间年月日时分秒
-            string strYear = currentTime.ToString("yy");             //获取当前年的后两位
-            YY = Convert.ToByte(strYear);    //将字符串strYear转换成byte型             
-            MM = (byte)currentTime.Month;    //将int型当前月转换成byte型
-            DD = (byte)currentTime.Day;     //将int型当前日转换成byte型
 
+
+
+
+        /// <summary>
+        /// 获取芯片id
+        /// </summary>
+        public static void GetChipId()
+        {
+            //System.DateTime currentTime = new System.DateTime();
+            //currentTime = System.DateTime.Now;    //获取当前时间年月日时分秒
+            //string strYear = currentTime.ToString("yy");             //获取当前年的后两位
+            //YY = Convert.ToByte(strYear);    //将字符串strYear转换成byte型             
+            //MM = (byte)currentTime.Month;    //将int型当前月转换成byte型
+            //DD = (byte)currentTime.Day;     //将int型当前日转换成byte型
+            GetNowTime();
             byte[] data_buf = new byte[16];
             int data_len = 0;
             UdpClient myUdpClient = new UdpClient();
@@ -82,7 +93,7 @@ namespace WpfUdp
 
             IPAddress.TryParse("192.168.1.109", out remoteIP);
 
-            UInt16 port = 1032;
+            UInt16 port = 1031;
 
             IPEndPoint iep = new IPEndPoint(remoteIP, port);
             deadlineYY += YY;
@@ -127,18 +138,34 @@ namespace WpfUdp
                 MessageBox.Show(err.Message, "发送失败");
             }
         }
-  
+
+        public static void GetNowTime()
+        {
+
+            System.DateTime currentTime = new System.DateTime();
+            currentTime = System.DateTime.Now;    //获取当前时间年月日时分秒          
+            string strYear = currentTime.ToString("yy");             //获取当前年的后两位
+
+            YY = Convert.ToByte(strYear);           //将字符串strYear转换成byte型             
+            MM = (byte)currentTime.Month;           //将int型当前月转换成byte型
+            DD = (byte)currentTime.Day;             //将int型当前日转换成byte型
+            HH = (byte)currentTime.Hour;       //将int型当前时转换成byte型 
+            mm = (byte)currentTime.Minute;     //将int型当前分转换成byte型
+
+        }
+
+
         /// <summary>
         /// 发送校验代码函数，用于发送指令给串口板，校验信息
         /// </summary>
-        public void sendCheckData()
+        public static void sendCheckData()
         {
             byte[] data_buf = new byte[16];
             int data_len = 0;
             UdpClient myUdpClient = new UdpClient();
             IPAddress remoteIP;
             IPAddress.TryParse("192.168.1.109", out remoteIP);
-            UInt16 port = 1032;
+            UInt16 port = 1031;
             IPEndPoint iep = new IPEndPoint(remoteIP, port);
             try
             {
@@ -156,53 +183,159 @@ namespace WpfUdp
                     checkOutFile[7] = 0x88;
                     File.WriteAllBytes(@"C: \Users\shuqee\Desktop\shuqee.bin", checkOutFile);
                 }
-                checkOutFile[0] ^= 0x33;
-                checkOutFile[1] ^= 0x44;
-                checkOutFile[2] ^= 0x55;
-                checkOutFile[3] ^= 0x66;
-                checkOutFile[4] ^= 0x77;
-                checkOutFile[5] ^= 0x88;
-                checkOutFile[6] ^= 0x99;
+                checkOutFile[0] ^= 51;
+                checkOutFile[1] ^= 68;
+                checkOutFile[2] ^= 85;
+                checkOutFile[3] ^= 102;
+                checkOutFile[4] ^= 119;
+                checkOutFile[5] ^= 136;
+                checkOutFile[6] ^= 153;
 
-
-                System.DateTime currentTime = new System.DateTime();
-                currentTime = System.DateTime.Now;    //获取当前时间年月日时分秒
+                GetNowTime();
+                //System.DateTime currentTime = new System.DateTime();
+                //currentTime = System.DateTime.Now;    //获取当前时间年月日时分秒
                 //int years = currentTime.Year;         //获取当前年
                 //int months = currentTime.Month;       //获取当前月
                 //int days = currentTime.Day;           //获取当前日
 
-                string strYear = currentTime.ToString("yy");             //获取当前年的后两位
+                //string strYear = currentTime.ToString("yy");             //获取当前年的后两位
 
-                YY = Convert.ToByte(strYear);           //将字符串strYear转换成byte型             
-                MM = (byte)currentTime.Month;           //将int型当前月转换成byte型
-                DD = (byte)currentTime.Day;             //将int型当前日转换成byte型
-                byte HH = (byte)currentTime.Hour;       //将int型当前时转换成byte型 
-                byte mm = (byte)currentTime.Minute;     //将int型当前分转换成byte型
-               
-                data_buf[0] = 0xff;          
+                //YY = Convert.ToByte(strYear);           //将字符串strYear转换成byte型             
+                //MM = (byte)currentTime.Month;           //将int型当前月转换成byte型
+                //DD = (byte)currentTime.Day;             //将int型当前日转换成byte型
+                //byte HH = (byte)currentTime.Hour;       //将int型当前时转换成byte型 
+                //byte mm = (byte)currentTime.Minute;     //将int型当前分转换成byte型
+
+                checkOutFile[0] ^= 52;
+                checkOutFile[1] ^= 117;
+                checkOutFile[2] ^= 106;
+                checkOutFile[3] ^= 123;
+                checkOutFile[4] ^= 74;
+                checkOutFile[5] ^= 124;
+                checkOutFile[6] ^= 143;
+
+                data_buf[0] = 0xff;
                 data_buf[1] = 0x47;
                 data_buf[2] = YY;
                 data_buf[3] = MM;
                 data_buf[4] = DD;
-                data_buf[5] = HH;
-                data_buf[6] = mm;
-                data_buf[7] = (byte)(checkOutFile[0]^0x34);
-                data_buf[8] = (byte)(checkOutFile[1]^0x75);
-                data_buf[9] = (byte)(checkOutFile[2]^0x6a);
-                data_buf[10] = (byte)(checkOutFile[3]^0x7b);
-                data_buf[11] = (byte)(checkOutFile[4]^0x4a);
-                data_buf[12] = (byte)(checkOutFile[5]^0x7c);
-                data_buf[13] = (byte)(checkOutFile[6]^0x8f);           
+                data_buf[5] = HH;    
+                data_buf[6] = mm;   
+                data_buf[7] = checkOutFile[0];
+                data_buf[8] = checkOutFile[1];
+                data_buf[9] = checkOutFile[2];
+                data_buf[10] = checkOutFile[3];
+                data_buf[11] = checkOutFile[4];
+                data_buf[12] = checkOutFile[5];
+                data_buf[13] = checkOutFile[6];
                 data_buf[14] = 0xee;
 
                 data_len = 15;
                 myUdpClient.Send(data_buf, data_len, iep);
                 myUdpClient.Close();
-                //textBoxSend.Focus();
             }
             catch (Exception err)
             {
                 MessageBox.Show(err.Message, "发送失败");
+            }
+        }
+
+
+
+        /// <summary>
+        /// 串口发送数据
+        /// </summary>
+        /// <param name="serialPort">串口</param>
+        /// <param name="data1">1号缸数据</param>
+        /// <param name="data2">2号缸数据</param>
+        /// <param name="data3">3号缸数据</param>
+        /// <param name="data4">环境特效</param>
+        /// <param name="data5">座椅特效</param>
+        public void SendBytesData(SerialPort serialPort, byte data1, byte data2, byte data3, byte data4, byte data5)
+        {
+            //byte[] bytesSend = System.Text.ASCIIEncoding.Default.GetBytes(textBox.Text );
+            byte[] bytesSend = new byte[9];
+            bytesSend[0] = 0xFF;
+            bytesSend[1] = 0x4a;
+            bytesSend[2] = data1;
+            bytesSend[3] = data2;
+            bytesSend[4] = data3;
+            bytesSend[5] = data4;
+            bytesSend[6] = data5;
+            bytesSend[7] = 0x01;
+            bytesSend[8] = 0xEE;
+            //serialPort.Write(bytesSend,0,bytesSend.Length);
+            try
+            {
+                serialPort.Write(bytesSend, 0, 9);
+            }
+            catch
+            {
+
+            }
+        }
+
+
+
+        /// <summary>
+        /// 获取当前帧的动作数据与特效数据，并调用发送数据方法
+        /// </summary>
+        /// <param name="pos">传入的时间值</param>
+        public void FlimValue(double pos)
+        {
+            pos = pos * 1200;
+            byte last1;
+            byte last2;
+            byte last3;
+            byte lastt1;
+            byte lastt2;
+            try
+            {
+                last1 = MainWindow.actionFile[(int)(3 * (pos / 50))];
+                last2 = MainWindow.actionFile[(int)(3 * (pos / 50) + 1)];
+                last3 = MainWindow.actionFile[(int)(3 * (pos / 50) + 2)];
+                lastt1 = MainWindow.effectFile[(int)(2 * (pos / 50))];
+                lastt2 = MainWindow.effectFile[(int)(2 * (pos / 50) + 1)];
+            }
+            catch
+            {
+                last1 = 0;
+                last2 = 0;
+                last3 = 0;
+                lastt1 = 0;
+                lastt2 = 0;
+            }
+            SendBytesData(com1, last1, last2, last3, lastt1, lastt2);
+
+        }
+
+
+
+        /// <summary>
+        /// 串口初始化
+        /// </summary>
+        public static void SerialInit()
+        {
+
+            com1.PortName = "COM1";
+            com1.BaudRate = 9600;
+            com1.Parity = Parity.None;
+            com1.DataBits = 8;
+            com1.StopBits = StopBits.One;
+            try
+            {
+                if (!com1.IsOpen)
+                {
+                    com1.Open();
+                }
+                else
+                {
+                    MessageBox.Show("port is open!");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("port erro");
             }
         }
 

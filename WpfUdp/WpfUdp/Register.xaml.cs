@@ -43,8 +43,6 @@ namespace WpfUdp
         //}
 
 
-
-
         private void GetUserCode_Click(object sender, RoutedEventArgs e)
         {
             //Module  myClass = new Module ();
@@ -53,13 +51,14 @@ namespace WpfUdp
             Random rd = new Random();
             userCode = rd.Next().ToString();
             textUserCode.Text = userCode;                   //将用户码显示在文本框
+            Module.GetChipId();
         }
 
         /// <summary>
         /// md5 32位加密
         /// </summary>
         /// <param name="传入的参数值password"></param>
-        /// <returns></returns>
+        /// <returns>返回经过md5加密的字符串</returns>
         public static string MD5Encrypt32(string password)
         {
             string cl = password;
@@ -88,12 +87,11 @@ namespace WpfUdp
 
         private void textUserCode_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //MessageBox.Show("123");
 
             RegisterCode = MD5Encrypt32(MD5Encrypt32(MD5Encrypt32(userCode)));
 
-
         }
+
 
         private void Register_Click(object sender, RoutedEventArgs e)
         {
@@ -102,31 +100,31 @@ namespace WpfUdp
 
             string changeRegisterCode = textRegisterCode.Text;        //注册码文本框的字符串包含期限信息
 
-            string ss1 = changeRegisterCode.Substring(0, 4);
-            string s11 = changeRegisterCode.Substring(4, 1);
+            string str1 = changeRegisterCode.Substring(0, 4);
+            string strThousands = changeRegisterCode.Substring(4, 1);
 
-            string ss2 = changeRegisterCode.Substring(5, 6);
-            string s12 = changeRegisterCode.Substring(11, 1);
+            string str2 = changeRegisterCode.Substring(5, 6);
+            string strHundreds = changeRegisterCode.Substring(11, 1);
 
-            string ss3 = changeRegisterCode.Substring(12, 8);
-            string s13 = changeRegisterCode.Substring(20, 1);
+            string str3 = changeRegisterCode.Substring(12, 8);
+            string strTens = changeRegisterCode.Substring(20, 1);
 
-            string ss4 = changeRegisterCode.Substring(21, 10);
-            string s14 = changeRegisterCode.Substring(31, 1);
+            string str4 = changeRegisterCode.Substring(21, 10);
+            string strUnits = changeRegisterCode.Substring(31, 1);
 
 
-            string s15 = changeRegisterCode.Substring(32, 2);
-            string ss5 = changeRegisterCode.Substring(34, 4);
+            string strAdd = changeRegisterCode.Substring(32, 2);
+            string str5 = changeRegisterCode.Substring(34, 4);
 
             //得到最终的注册码
-            string ss = ss1 + ss2 + ss3 + ss4 + ss5;
+            string SHUQEE = str1 + str2 + str3 + str4 + str5;
             //注册码的期限信息
-            int s1 = Int32.Parse(s11) + Int32.Parse(s12) + Int32.Parse(s13) + Int32.Parse(s14);
+            int dateAdd = Int32.Parse(strThousands) + Int32.Parse(strHundreds) + Int32.Parse(strTens) + Int32.Parse(strUnits);
 
-            if (s1 != 36) //转换成实际的期限
+            if (dateAdd != 36) //转换成实际的期限
             {
                 Module.deadlineOrPermanent = 0x4;
-                int totalDays = 1000 * (Int32.Parse(s11)) + 100 * (Int32.Parse(s12)) + 10 * (Int32.Parse(s13)) + Int32.Parse(s14);
+                int totalDays = 1000 * (Int32.Parse(strThousands)) + 100 * (Int32.Parse(strHundreds)) + 10 * (Int32.Parse(strTens)) + Int32.Parse(strUnits);
                 Module.deadlineYY = (byte)(totalDays / 365);
                 int remainDays = totalDays % 365;
                 Module.deadlineMM = (byte)(remainDays / 30);
@@ -138,16 +136,16 @@ namespace WpfUdp
             }
 
 
-            if (ss == RegisterCode && s1 == Int32.Parse(s15))
+            if (SHUQEE == RegisterCode && dateAdd == Int32.Parse(strAdd))
             {
                 MessageBox.Show("注册成功");
-                myClass.GetChipId();
+                Module.GetChipId();
                 this.Hide();
                 MainWindow mainwindow = new MainWindow();
                 mainwindow.Show();
                 Module.chipID[7] = 0x88;
                 Module.chipID[8] = 0x1;
-                Module.chipID[9] = Module.YY;
+                Module.chipID[9] = Module.YY;           
                 Module.chipID[10] = Module.MM;
                 Module.chipID[11] = Module.DD;
 
@@ -155,13 +153,13 @@ namespace WpfUdp
                 Module.MM ^= 0x7c;
                 Module.DD ^= 0xB8;
 
-                Module.chipID[0] ^= 0x33;
-                Module.chipID[1] ^= 0x44;
-                Module.chipID[2] ^= 0x55;
-                Module.chipID[3] ^= 0x66;
-                Module.chipID[4] ^= 0x77;
-                Module.chipID[5] ^= 0x88;
-                Module.chipID[6] ^= 0x99;
+                Module.chipID[0] ^= 0x33;       //芯片id1   
+                Module.chipID[1] ^= 0x44;       //芯片id2
+                Module.chipID[2] ^= 0x55;       //芯片id3
+                Module.chipID[3] ^= 0x66;       //芯片id4
+                Module.chipID[4] ^= 0x77;       //芯片id5
+                Module.chipID[5] ^= 0x88;       //芯片id6 
+                Module.chipID[6] ^= 0x99;       //芯片id7
 
                 Module.chipID[0] ^= 0x34;
                 Module.chipID[1] ^= 0x75;
@@ -193,10 +191,10 @@ namespace WpfUdp
 
         private void Window_Closed(object sender, EventArgs e)
         {
-
+            
             MainWindow mainwindow = new MainWindow();
-            mainwindow.Show();
-
+            //mainwindow.Show();
+            mainwindow.ShowDialog();
         }
     }
 }
